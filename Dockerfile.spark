@@ -1,0 +1,25 @@
+FROM openjdk:8
+
+# Set environment variables
+ENV SPARK_VERSION=3.4.3
+ENV HADOOP_VERSION=3
+ENV SPARK_HOME=/usr/local/spark
+ENV JAVA_HOME=/usr/local/openjdk-8
+ENV PATH=$PATH:$SPARK_HOME/bin:$JAVA_HOME/bin
+
+# Copy local Spark tarball and install
+COPY spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz /tmp/
+RUN tar -xzvf /tmp/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz -C /usr/local/ \
+    && mv /usr/local/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION} /usr/local/spark \
+    && rm /tmp/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz
+
+# Spark configuration
+COPY spark-defaults.conf $SPARK_HOME/conf/
+COPY start-spark.sh /usr/local/spark/
+
+RUN chmod +x /usr/local/spark/start-spark.sh
+
+# Expose ports
+EXPOSE 8080 7077
+
+CMD ["/usr/local/spark/start-spark.sh"]

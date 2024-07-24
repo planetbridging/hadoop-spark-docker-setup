@@ -1,0 +1,56 @@
+version: '3.8'
+services:
+  namenode:
+    build:
+      context: .
+      dockerfile: Dockerfile.hadoop
+    container_name: namenode
+    hostname: namenode
+    volumes:
+      - ./data/namenode:/usr/local/hadoop/data/nameNode
+      - ./hadoop-3.3.6.tar.gz:/tmp/hadoop-3.3.6.tar.gz
+    ports:
+      - "9870:9870"
+      - "9000:9000"
+      - "2222:22"    # Map the SSH port
+    environment:
+      - HDFS_NAMENODE_USER=root
+      - HDFS_DATANODE_USER=root
+      - HDFS_SECONDARYNAMENODE_USER=root
+      - HDFS_CONF_dfs_replication=1
+      - JAVA_HOME=/usr/local/openjdk-8
+      - HADOOP_VERSION=3.3.6   # Define HADOOP_VERSION here
+    command: ["/usr/local/hadoop/start-hadoop.sh"]
+    privileged: true           # Add this line to run with elevated permissions
+    ulimits:                   # Add ulimits configuration
+      nproc: 65535
+      nofile:
+        soft: 65535
+        hard: 65535
+
+  datanode:
+    build:
+      context: .
+      dockerfile: Dockerfile.hadoop
+    container_name: datanode
+    hostname: datanode
+    volumes:
+      - ./data/datanode:/usr/local/hadoop/data/dataNode
+      - ./hadoop-3.3.6.tar.gz:/tmp/hadoop-3.3.6.tar.gz
+    depends_on:
+      - namenode
+    ports:
+      - "2223:22"    # Map the SSH port
+    environment:
+      - HDFS_NAMENODE_USER=root
+      - HDFS_DATANODE_USER=root
+      - HDFS_SECONDARYNAMENODE_USER=root
+      - JAVA_HOME=/usr/local/openjdk-8
+      - HADOOP_VERSION=3.3.6   # Define HADOOP_VERSION here
+    command: ["/usr/local/hadoop/start-hadoop.sh"]
+    privileged: true           # Add this line to run with elevated permissions
+    ulimits:                   # Add ulimits configuration
+      nproc: 65535
+      nofile:
+        soft: 65535
+        hard: 65535

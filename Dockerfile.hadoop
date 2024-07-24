@@ -1,0 +1,43 @@
+FROM openjdk:8
+
+# Set environment variables
+ARG HADOOP_VERSION=3.3.6
+ENV HADOOP_HOME=/usr/local/hadoop
+ENV JAVA_HOME=/usr/local/openjdk-8
+ENV PATH=$PATH:$HADOOP_HOME/bin:$JAVA_HOME/bin
+
+# Install SSH
+RUN apt-get update && apt-get install -y openssh-server && mkdir /var/run/sshd
+
+# Generate SSH keys
+RUN ssh-keygen -t rsa -P '' -f /root/.ssh/id_rsa && cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
+
+# Disable StrictHostKeyChecking
+RUN echo "    StrictHostKeyChecking no" >> /etc/ssh/ssh_config
+
+# Copy local Hadoop tarball and install
+COPY hadoop-3.3.6.tar.gz /tmp/
+RUN tar -xzvf /tmp/hadoop-3.3.6.tar.gz -C /usr/local/ \
+    && mv /usr/local/hadoop-3.3.6 /usr/local/hadoop \
+    && rm /tmp/hadoop-3.3.6.tar.gz
+
+# Copy configuration files
+COPY core-site.xml $HADOOP_HOME/etc/hadoop/
+COPY hdfs-site.xml $HADOOP_HOME/etc/hadoop/
+COPY hadoop-env.sh $HADOOP_HOME/etc/hadoop/
+COPY start-hadoop.sh /usr/local/hadoop/
+
+# Set executable permission
+RUN chmod +x /usr/local/hadoop/start-hadoop.sh
+
+# Set ulimit values
+RUN echo "* soft nproc 65535" >> /etc/security/limits.conf && \
+    echo "* hard nproc 65535" >> /etc/security/limits.conf && \
+    echo "* soft nofile 65535" >> /etc/security/limits.conf && \
+    echo "* hard nofile 65535" >> /etc/security/limits.conf
+
+# Expose ports
+EXPOSE 9870 9000 22
+
+# Start SSH and Hadoop
+CMD service ssh start && /usr/local/hadoop/start-hadoop.sh
