@@ -11,9 +11,16 @@ echo "JAVA_HOME is set to: $JAVA_HOME"
 # Start SSH service
 service ssh start
 
-# Format namenode (only for the first time)
-if [ ! -d "/usr/local/hadoop/data/nameNode/current" ]; then
-    $HADOOP_HOME/bin/hdfs namenode -format
+# Create a directory to store the FORMATTED file if it doesn't exist
+mkdir -p /usr/local/hadoop/formatted
+
+# Format namenode (only if not already formatted)
+if [ ! -f "/usr/local/hadoop/formatted/FORMATTED" ]; then
+    echo "Formatting NameNode..."
+    yes Y | $HADOOP_HOME/bin/hdfs namenode -format
+    touch /usr/local/hadoop/formatted/FORMATTED
+else
+    echo "NameNode already formatted."
 fi
 
 # Start HDFS
