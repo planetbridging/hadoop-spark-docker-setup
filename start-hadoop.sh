@@ -34,5 +34,8 @@ $HADOOP_HOME/bin/hdfs dfs -mkdir -p /user/dr.who
 $HADOOP_HOME/bin/hdfs dfs -chown dr.who:supergroup /user/dr.who
 $HADOOP_HOME/bin/hdfs dfs -chmod 755 /user/dr.who
 
+groupadd supergroup
+usermod -a -G supergroup dr.who
+
 # Keep container running
 tail -f /dev/null

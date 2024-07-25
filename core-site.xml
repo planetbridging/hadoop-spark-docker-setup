@@ -3,4 +3,12 @@
         <name>fs.defaultFS</name>
         <value>hdfs://namenode:9000</value>
     </property>
+    <property>
+        <name>hadoop.proxyuser.dr.who.groups</name>
+        <value>*</value>
+    </property>
+    <property>
+        <name>hadoop.proxyuser.dr.who.hosts</name>
+        <value>*</value>
+    </property>
 </configuration>
