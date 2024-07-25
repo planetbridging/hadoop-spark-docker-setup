@@ -26,9 +26,13 @@ fi
 # Start HDFS
 $HADOOP_HOME/sbin/start-dfs.sh
 
+# Wait for HDFS to start
+sleep 10
+
 # Set ownership and permissions for HDFS directories
 $HADOOP_HOME/bin/hdfs dfs -mkdir -p /user/dr.who
 $HADOOP_HOME/bin/hdfs dfs -chown dr.who:supergroup /user/dr.who
+$HADOOP_HOME/bin/hdfs dfs -chmod 755 /user/dr.who
 
 # Keep container running
 tail -f /dev/null
