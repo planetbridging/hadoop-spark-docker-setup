@@ -30,9 +30,18 @@ $HADOOP_HOME/sbin/start-dfs.sh
 sleep 10
 
 # Set ownership and permissions for HDFS directories
-$HADOOP_HOME/bin/hdfs dfs -mkdir -p /user/dr.who
-$HADOOP_HOME/bin/hdfs dfs -chown dr.who:supergroup /user/dr.who
-$HADOOP_HOME/bin/hdfs dfs -chmod 755 /user/dr.who
+#$HADOOP_HOME/bin/hdfs dfs -mkdir -p /user/dr.who
+#$HADOOP_HOME/bin/hdfs dfs -chown dr.who:supergroup /user/dr.who
+#$HADOOP_HOME/bin/hdfs dfs -chmod 755 /user/dr.who
+
+# Set ownership and permissions for HDFS directories
+su hdfs -c "$HADOOP_HOME/bin/hdfs dfs -mkdir -p /user/dr.who"
+su hdfs -c "$HADOOP_HOME/bin/hdfs dfs -chown dr.who:supergroup /user/dr.who"
+su hdfs -c "$HADOOP_HOME/bin/hdfs dfs -chmod 755 /user/dr.who"
+su hdfs -c "$HADOOP_HOME/bin/hdfs dfs -chmod 777 /"
+
+groupadd supergroup
+usermod -a -G supergroup dr.who
 
 # Keep container running
 tail -f /dev/null
